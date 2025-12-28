@@ -8,18 +8,19 @@ import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error
-import streamlit as st  # <--- CHANGED 1: Added this library
+import streamlit as st
 
 # -----------------------------------------------
-# 0. App Title (Optional but good for web)
+# 0. App Title
 # -----------------------------------------------
-st.title("My Regression Assignment 📊") # <--- Added this so the page has a name
+st.title("My Regression Assignment 📊")
 
 # -----------------------------------------------
 # 1. Load dataset from UCI
 # -----------------------------------------------
-@st.cache_data  # <--- OPTIONAL: This makes the app load faster
+@st.cache_data
 def load_data():
+    # This URL is an .xls file, so we need 'xlrd' installed in requirements.txt
     url = "https://archive.ics.uci.edu/ml/machine-learning-databases/concrete/compressive/Concrete_Data.xls"
     df = pd.read_excel(url)
     df.columns = [
@@ -28,9 +29,13 @@ def load_data():
     ]
     return df
 
-data = load_data()
+try:
+    data = load_data()
+except Exception as e:
+    st.error(f"Error loading data: {e}")
+    st.stop()
 
-# Show the raw data to your friend (Optional)
+# Show the raw data (Optional)
 if st.checkbox("Show Raw Data"):
     st.write(data.head())
 
@@ -48,8 +53,10 @@ X_train, X_test, y_train, y_test = train_test_split(
 # -----------------------------------------------
 # 3. Scatter plots for feature vs strength
 # -----------------------------------------------
-st.subheader("Feature Scatter Plots") # <--- Added a header
-plt.figure(figsize=(14, 10))
+st.subheader("Feature Scatter Plots")
+
+# Use a specific figure object to prevent errors
+fig1 = plt.figure(figsize=(14, 10))
 for i, name in enumerate(feature_names, start=1):
     plt.subplot(3, 3, i)
     plt.scatter(data[name], data["strength"], s=10, alpha=0.6)
@@ -57,20 +64,24 @@ for i, name in enumerate(feature_names, start=1):
     plt.ylabel("strength")
     plt.title(f"{name} vs strength")
 plt.tight_layout()
-st.pyplot(plt) # <--- CHANGED 2: Replaced plt.show()
+
+st.pyplot(fig1)
 
 # -----------------------------------------------
 # 4. Correlation bar plot with target variable
 # -----------------------------------------------
-st.subheader("Correlation Plot") # <--- Added a header
+st.subheader("Correlation Plot")
 correlations = data.corr()["strength"].drop("strength")
-plt.figure(figsize=(7, 4))
+
+# Use a specific figure object
+fig2 = plt.figure(figsize=(7, 4))
 plt.bar(correlations.index, correlations.values, color="green")
 plt.xticks(rotation=45, ha="right")
 plt.title("Correlation of features with strength")
 plt.ylabel("corr(feature, strength)")
 plt.tight_layout()
-st.pyplot(plt) # <--- CHANGED 2: Replaced plt.show()
+
+st.pyplot(fig2)
 
 # -----------------------------------------------
 # 5. Fit linear regression
@@ -83,13 +94,17 @@ y_pred = model.predict(X_test)
 # 6. Evaluate with Mean Squared Error
 # -----------------------------------------------
 mse = mean_squared_error(y_test, y_pred)
-st.success(f"Mean Squared Error (Test Set): {mse:.3f}") # <--- CHANGED 3: Replaced print()
+st.success(f"Mean Squared Error (Test Set): {mse:.3f}")
 
 # -----------------------------------------------
 # 7. Plot predicted vs actual
 # -----------------------------------------------
-st.subheader("Predictions vs Actual") # <--- Added a header
-plt.figure(figsize=(6, 6))
+st.subheader("Predictions vs Actual")
+
+# FIX IS HERE: Changed figsize from (6, 6) to (8, 6)
+# Making it wider creates space for the "Predicted strength" label
+fig3 = plt.figure(figsize=(8, 6))
+
 plt.scatter(y_test, y_pred, color='blue', alpha=0.7, s=12)
 plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--')
 plt.xlabel("Actual strength")
@@ -97,4 +112,5 @@ plt.ylabel("Predicted strength")
 plt.title("Predicted vs Actual (Test Set)")
 plt.grid(True)
 plt.tight_layout()
-st.pyplot(plt) # <--- CHANGED 2: Replaced plt.show()
+
+st.pyplot(fig3)
