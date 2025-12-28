@@ -55,7 +55,6 @@ X_train, X_test, y_train, y_test = train_test_split(
 # -----------------------------------------------
 st.subheader("Feature Scatter Plots")
 
-# Use a specific figure object to prevent errors
 fig1 = plt.figure(figsize=(14, 10))
 for i, name in enumerate(feature_names, start=1):
     plt.subplot(3, 3, i)
@@ -63,8 +62,9 @@ for i, name in enumerate(feature_names, start=1):
     plt.xlabel(name)
     plt.ylabel("strength")
     plt.title(f"{name} vs strength")
-plt.tight_layout()
 
+# FIX: Add extra space between the small charts
+plt.subplots_adjust(wspace=0.3, hspace=0.4) 
 st.pyplot(fig1)
 
 # -----------------------------------------------
@@ -73,14 +73,14 @@ st.pyplot(fig1)
 st.subheader("Correlation Plot")
 correlations = data.corr()["strength"].drop("strength")
 
-# Use a specific figure object
-fig2 = plt.figure(figsize=(7, 4))
+fig2 = plt.figure(figsize=(8, 5)) # Made slightly bigger
 plt.bar(correlations.index, correlations.values, color="green")
 plt.xticks(rotation=45, ha="right")
 plt.title("Correlation of features with strength")
 plt.ylabel("corr(feature, strength)")
-plt.tight_layout()
 
+# FIX: Force extra margin at bottom (for rotated labels) and left (for Y label)
+plt.subplots_adjust(bottom=0.25, left=0.15)
 st.pyplot(fig2)
 
 # -----------------------------------------------
@@ -101,16 +101,14 @@ st.success(f"Mean Squared Error (Test Set): {mse:.3f}")
 # -----------------------------------------------
 st.subheader("Predictions vs Actual")
 
-# FIX IS HERE: Changed figsize from (6, 6) to (8, 6)
-# Making it wider creates space for the "Predicted strength" label
 fig3 = plt.figure(figsize=(8, 6))
-
 plt.scatter(y_test, y_pred, color='blue', alpha=0.7, s=12)
 plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--')
 plt.xlabel("Actual strength")
 plt.ylabel("Predicted strength")
 plt.title("Predicted vs Actual (Test Set)")
 plt.grid(True)
-plt.tight_layout()
 
+# FIX: Force extra margin on the left so "Predicted strength" fits perfectly
+plt.subplots_adjust(left=0.15)
 st.pyplot(fig3)
