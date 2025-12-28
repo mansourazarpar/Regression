@@ -20,7 +20,6 @@ st.title("My Regression Assignment 📊")
 # -----------------------------------------------
 @st.cache_data
 def load_data():
-    # This URL is an .xls file, so we need 'xlrd' installed in requirements.txt
     url = "https://archive.ics.uci.edu/ml/machine-learning-databases/concrete/compressive/Concrete_Data.xls"
     df = pd.read_excel(url)
     df.columns = [
@@ -63,7 +62,7 @@ for i, name in enumerate(feature_names, start=1):
     plt.ylabel("strength")
     plt.title(f"{name} vs strength")
 
-# FIX: Add extra space between the small charts
+# Add plenty of space between the charts
 plt.subplots_adjust(wspace=0.3, hspace=0.4) 
 st.pyplot(fig1)
 
@@ -73,14 +72,14 @@ st.pyplot(fig1)
 st.subheader("Correlation Plot")
 correlations = data.corr()["strength"].drop("strength")
 
-fig2 = plt.figure(figsize=(8, 5)) # Made slightly bigger
+fig2 = plt.figure(figsize=(8, 6))
 plt.bar(correlations.index, correlations.values, color="green")
 plt.xticks(rotation=45, ha="right")
 plt.title("Correlation of features with strength")
 plt.ylabel("corr(feature, strength)")
 
-# FIX: Force extra margin at bottom (for rotated labels) and left (for Y label)
-plt.subplots_adjust(bottom=0.25, left=0.15)
+# FIX 1: Increased 'bottom' to 0.3 (for rotated labels) and 'left' to 0.2 (for Y-label)
+plt.subplots_adjust(bottom=0.3, left=0.2)
 st.pyplot(fig2)
 
 # -----------------------------------------------
@@ -109,6 +108,6 @@ plt.ylabel("Predicted strength")
 plt.title("Predicted vs Actual (Test Set)")
 plt.grid(True)
 
-# FIX: Force extra margin on the left so "Predicted strength" fits perfectly
-plt.subplots_adjust(left=0.15)
+# FIX 2: Increased 'left' to 0.25. This creates a BIG margin on the left side.
+plt.subplots_adjust(left=0.25)
 st.pyplot(fig3)
