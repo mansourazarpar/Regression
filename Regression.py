@@ -54,7 +54,9 @@ X_train, X_test, y_train, y_test = train_test_split(
 # -----------------------------------------------
 st.subheader("Feature Scatter Plots")
 
-fig1 = plt.figure(figsize=(14, 10))
+# FIX: Added layout='constrained'. This guarantees labels fit inside the box.
+fig1 = plt.figure(figsize=(14, 10), layout='constrained')
+
 for i, name in enumerate(feature_names, start=1):
     plt.subplot(3, 3, i)
     plt.scatter(data[name], data["strength"], s=10, alpha=0.6)
@@ -62,8 +64,6 @@ for i, name in enumerate(feature_names, start=1):
     plt.ylabel("strength")
     plt.title(f"{name} vs strength")
 
-# Add plenty of space between the charts
-plt.subplots_adjust(wspace=0.3, hspace=0.4) 
 st.pyplot(fig1)
 
 # -----------------------------------------------
@@ -72,14 +72,14 @@ st.pyplot(fig1)
 st.subheader("Correlation Plot")
 correlations = data.corr()["strength"].drop("strength")
 
-fig2 = plt.figure(figsize=(8, 6))
+# FIX: Added layout='constrained'
+fig2 = plt.figure(figsize=(8, 6), layout='constrained')
+
 plt.bar(correlations.index, correlations.values, color="green")
 plt.xticks(rotation=45, ha="right")
 plt.title("Correlation of features with strength")
 plt.ylabel("corr(feature, strength)")
 
-# FIX 1: Increased 'bottom' to 0.3 (for rotated labels) and 'left' to 0.2 (for Y-label)
-plt.subplots_adjust(bottom=0.3, left=0.2)
 st.pyplot(fig2)
 
 # -----------------------------------------------
@@ -100,7 +100,9 @@ st.success(f"Mean Squared Error (Test Set): {mse:.3f}")
 # -----------------------------------------------
 st.subheader("Predictions vs Actual")
 
-fig3 = plt.figure(figsize=(8, 6))
+# FIX: Added layout='constrained'
+fig3 = plt.figure(figsize=(8, 6), layout='constrained')
+
 plt.scatter(y_test, y_pred, color='blue', alpha=0.7, s=12)
 plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--')
 plt.xlabel("Actual strength")
@@ -108,6 +110,4 @@ plt.ylabel("Predicted strength")
 plt.title("Predicted vs Actual (Test Set)")
 plt.grid(True)
 
-# FIX 2: Increased 'left' to 0.25. This creates a BIG margin on the left side.
-plt.subplots_adjust(left=0.25)
 st.pyplot(fig3)
