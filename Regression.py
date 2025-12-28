@@ -20,6 +20,7 @@ st.title("My Regression Assignment 📊")
 # -----------------------------------------------
 @st.cache_data
 def load_data():
+    # Ensure 'xlrd' is in your requirements.txt
     url = "https://archive.ics.uci.edu/ml/machine-learning-databases/concrete/compressive/Concrete_Data.xls"
     df = pd.read_excel(url)
     df.columns = [
@@ -34,7 +35,6 @@ except Exception as e:
     st.error(f"Error loading data: {e}")
     st.stop()
 
-# Show the raw data (Optional)
 if st.checkbox("Show Raw Data"):
     st.write(data.head())
 
@@ -54,17 +54,25 @@ X_train, X_test, y_train, y_test = train_test_split(
 # -----------------------------------------------
 st.subheader("Feature Scatter Plots")
 
-# FIX: Added layout='constrained'. This guarantees labels fit inside the box.
-fig1 = plt.figure(figsize=(14, 10), layout='constrained')
+fig1, axes = plt.subplots(3, 3, figsize=(14, 10))
+# Flatten the 3x3 array of axes to make it easier to loop over
+axes = axes.flatten()
 
-for i, name in enumerate(feature_names, start=1):
-    plt.subplot(3, 3, i)
-    plt.scatter(data[name], data["strength"], s=10, alpha=0.6)
-    plt.xlabel(name)
-    plt.ylabel("strength")
-    plt.title(f"{name} vs strength")
+for i, name in enumerate(feature_names):
+    ax = axes[i]
+    ax.scatter(data[name], data["strength"], s=10, alpha=0.6)
+    ax.set_xlabel(name)
+    ax.set_ylabel("strength")
+    ax.set_title(f"{name} vs strength")
 
-st.pyplot(fig1)
+# Hide any empty subplots (if features < 9)
+for j in range(len(feature_names), len(axes)):
+    axes[j].set_visible(False)
+
+plt.tight_layout()
+
+# FIX 1: pad_inches=0.2 adds a safety border around the image
+st.pyplot(fig1, bbox_inches='tight', pad_inches=0.2)
 
 # -----------------------------------------------
 # 4. Correlation bar plot with target variable
@@ -72,15 +80,17 @@ st.pyplot(fig1)
 st.subheader("Correlation Plot")
 correlations = data.corr()["strength"].drop("strength")
 
-# FIX: Added layout='constrained'
-fig2 = plt.figure(figsize=(8, 6), layout='constrained')
-
-plt.bar(correlations.index, correlations.values, color="green")
+fig2, ax2 = plt.subplots(figsize=(8, 6))
+ax2.bar(correlations.index, correlations.values, color="green")
 plt.xticks(rotation=45, ha="right")
-plt.title("Correlation of features with strength")
-plt.ylabel("corr(feature, strength)")
+ax2.set_title("Correlation of features with strength")
+ax2.set_ylabel("corr(feature, strength)")
 
-st.pyplot(fig2)
+# Helper to ensure labels fit before saving
+plt.tight_layout()
+
+# FIX 2: pad_inches=0.2 prevents the Y-axis label from being cut
+st.pyplot(fig2, bbox_inches='tight', pad_inches=0.2)
 
 # -----------------------------------------------
 # 5. Fit linear regression
@@ -100,14 +110,15 @@ st.success(f"Mean Squared Error (Test Set): {mse:.3f}")
 # -----------------------------------------------
 st.subheader("Predictions vs Actual")
 
-# FIX: Added layout='constrained'
-fig3 = plt.figure(figsize=(8, 6), layout='constrained')
+fig3, ax3 = plt.subplots(figsize=(8, 6))
+ax3.scatter(y_test, y_pred, color='blue', alpha=0.7, s=12)
+ax3.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--')
+ax3.set_xlabel("Actual strength")
+ax3.set_ylabel("Predicted strength")
+ax3.set_title("Predicted vs Actual (Test Set)")
+ax3.grid(True)
 
-plt.scatter(y_test, y_pred, color='blue', alpha=0.7, s=12)
-plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--')
-plt.xlabel("Actual strength")
-plt.ylabel("Predicted strength")
-plt.title("Predicted vs Actual (Test Set)")
-plt.grid(True)
+plt.tight_layout()
 
-st.pyplot(fig3)
+# FIX 3: pad_inches=0.2 prevents "Predicted strength" from being cut
+st.pyplot(fig3, bbox_inches='tight', pad_inches=0.2)
